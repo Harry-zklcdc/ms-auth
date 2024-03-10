@@ -49,7 +49,7 @@ func (a *AuthStruct) deviceLoginPost1() (cookies, code string, err error) {
 		code = a.CredentialType.Credentials.RemoteNgcParams.Entropy
 	}
 
-	fmt.Println(a.reqClient.GetBodyString())
+	// fmt.Println(a.reqClient.GetBodyString())
 
 	for _, v := range a.reqClient.Cookies {
 		values := strings.Split(v.Value, ";")
