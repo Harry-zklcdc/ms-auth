@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
 )
 
 type getCredentialTypeReq struct {
@@ -54,7 +53,7 @@ type getCredentialTypeResp struct {
 	Username       string `json:"Username"`
 }
 
-func (a *AuthStruct) getCredentialType() (cookies string, err error) {
+func (a *AuthStruct) getCredentialType() (err error) {
 	reqBody := getCredentialTypeReq{
 		CheckPhones:                    false,
 		Country:                        "",
@@ -89,7 +88,7 @@ func (a *AuthStruct) getCredentialType() (cookies string, err error) {
 		SetBody(bytes.NewReader(reqB)).
 		Do()
 	if a.reqClient.GetStatusCode() != 200 {
-		return "", fmt.Errorf("get credential type failed, status code: %v", a.reqClient.GetStatusCode())
+		return fmt.Errorf("get credential type failed, status code: %v", a.reqClient.GetStatusCode())
 	}
 	// fmt.Println(a.reqClient.GetStatusCode())
 	// fmt.Println(a.reqClient.GetBodyString())
@@ -98,12 +97,6 @@ func (a *AuthStruct) getCredentialType() (cookies string, err error) {
 	if err != nil {
 		return
 	}
-
-	for _, v := range a.reqClient.Cookies {
-		values := strings.Split(v.Value, ";")
-		cookies += v.Name + "=" + values[0] + "; "
-	}
-	cookies = strings.Trim(cookies, "; ")
 
 	return
 }

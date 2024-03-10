@@ -77,8 +77,7 @@ func (a *AuthStruct) Auth() (cookies string, err error) {
 	if err = a.getSession(); err != nil {
 		return "", fmt.Errorf("get session failed: %v", err)
 	}
-	cookies, err = a.getCredentialType()
-	if err != nil {
+	if err = a.getCredentialType(); err != nil {
 		return "", fmt.Errorf("get credential type failed: %v", err)
 	}
 	switch a.LoginType {
@@ -93,7 +92,11 @@ func (a *AuthStruct) Auth() (cookies string, err error) {
 		}
 		return cookies, fmt.Errorf("email login need code to continue")
 	case TYPE_DEVICE:
-		return cookies, fmt.Errorf("device login need handler to continue, code: %s", a.CredentialType.Credentials.RemoteNgcParams.Entropy)
+		cookies, code, err := a.deviceLoginPost1()
+		if err != nil {
+			return "", fmt.Errorf("device login post1 failed: %v", err)
+		}
+		return cookies, fmt.Errorf("device login need handler to continue, code: %s", code)
 	}
 	if err = a.keepLoginPost(); err != nil {
 		return "", fmt.Errorf("keep login post failed: %v", err)
@@ -120,10 +123,10 @@ func (a *AuthStruct) AuthEmail(code string) (cookies string, err error) {
 }
 
 func (a *AuthStruct) AuthDevice() (cookies string, err error) {
-	if err = a.deviceLoginPost1(); err != nil {
+	if err = a.deviceLoginPost2(); err != nil {
 		return "", fmt.Errorf("device login post1 failed: %v", err)
 	}
-	if err = a.deviceLoginPost2(); err != nil {
+	if err = a.deviceLoginPost3(); err != nil {
 		return "", fmt.Errorf("device login post2 failed: %v", err)
 	}
 	if err = a.keepLoginPost(); err != nil {
