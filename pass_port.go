@@ -30,14 +30,14 @@ func (a *AuthStruct) passport() (cookie string, err error) {
 	}
 
 	postdata = url.Values{}
-	postdata.Add("NAPExp", a.passportData.napExp)
-	postdata.Add("pprid", a.passportData.pprid)
-	postdata.Add("NAP", a.passportData.nap)
-	postdata.Add("ANON", a.passportData.anon)
-	postdata.Add("ANONExp", a.passportData.anonExp)
-	postdata.Add("t", a.passportData.t)
+	postdata.Add("NAPExp", a.PassportData.NAPExp)
+	postdata.Add("pprid", a.PassportData.PPRID)
+	postdata.Add("NAP", a.PassportData.NAP)
+	postdata.Add("ANON", a.PassportData.ANON)
+	postdata.Add("ANONExp", a.PassportData.ANONExp)
+	postdata.Add("t", a.PassportData.T)
 
-	a.reqClient.Post().SetUrl("%v", a.actionUrl).
+	a.reqClient.Post().SetUrl("%v", a.ActionUrl).
 		SetContentType("application/x-www-form-urlencoded").
 		SetHeader("Origin", "https://login.live.com").
 		SetHeader("Referer", "https://login.live.com/").

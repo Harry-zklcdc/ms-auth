@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type getCredentialTypeReq struct {
@@ -53,12 +54,12 @@ type getCredentialTypeResp struct {
 	Username       string `json:"Username"`
 }
 
-func (a *AuthStruct) getCredentialType() (err error) {
+func (a *AuthStruct) getCredentialType() (cookies string, err error) {
 	reqBody := getCredentialTypeReq{
 		CheckPhones:                    false,
 		Country:                        "",
 		FederationFlags:                3,
-		FlowToken:                      a.flowToken,
+		FlowToken:                      a.FlowToken,
 		Forceotclogin:                  false,
 		IsCookieBannerShown:            false,
 		IsExternalFederationDisallowed: false,
@@ -70,11 +71,11 @@ func (a *AuthStruct) getCredentialType() (err error) {
 		IsSignup:                       false,
 		OriginalRequest:                "",
 		Otclogindisallowed:             false,
-		Uaid:                           a.uaid,
-		Username:                       a.account,
+		Uaid:                           a.Uaid,
+		Username:                       a.Account,
 	}
 
-	switch a.loginType {
+	switch a.LoginType {
 	case TYPE_DEVICE:
 		reqBody.IsFidoSupported = true
 	}
@@ -83,19 +84,26 @@ func (a *AuthStruct) getCredentialType() (err error) {
 	if err != nil {
 		return
 	}
-	a.reqClient.Post().SetUrl(a.urlGetCredentialType).
+	a.reqClient.Post().SetUrl(a.UrlGetCredentialType).
 		SetHeader("Content-Type", "application/json").
 		SetBody(bytes.NewReader(reqB)).
 		Do()
 	if a.reqClient.GetStatusCode() != 200 {
-		return fmt.Errorf("get credential type failed, status code: %v", a.reqClient.GetStatusCode())
+		return "", fmt.Errorf("get credential type failed, status code: %v", a.reqClient.GetStatusCode())
 	}
 	// fmt.Println(a.reqClient.GetStatusCode())
 	// fmt.Println(a.reqClient.GetBodyString())
 
-	err = json.Unmarshal(a.reqClient.GetBody(), &a.credentialType)
+	err = json.Unmarshal(a.reqClient.GetBody(), &a.CredentialType)
 	if err != nil {
 		return
 	}
-	return nil
+
+	for _, v := range a.reqClient.Cookies {
+		values := strings.Split(v.Value, ";")
+		cookies += v.Name + "=" + values[0] + "; "
+	}
+	cookies = strings.Trim(cookies, "; ")
+
+	return
 }

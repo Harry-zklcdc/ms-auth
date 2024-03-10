@@ -1,7 +1,9 @@
 package bingauth_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	bingauth "github.com/Harry-zklcdc/ms-auth"
@@ -28,10 +30,14 @@ func TestAuthEmail(t *testing.T) {
 			t.Error(err)
 			return
 		}
+		d, _ := json.Marshal(auth)
 
 		var code string
 		fmt.Printf("input code: ")
 		fmt.Scan(&code)
+		auth = bingauth.NewAuth("a@b.c", "", bingauth.TYPE_EMAIL)
+		auth.SetContext(d)
+		auth.SetCookie(cookie)
 		cookie, err = auth.AuthEmail(code)
 		if err != nil {
 			t.Error(err)
@@ -47,12 +53,16 @@ func TestAuthDevice(t *testing.T) {
 	auth := bingauth.NewAuth("a@b.c", "", bingauth.TYPE_DEVICE)
 	cookie, err := auth.Auth()
 	if err != nil {
-		if err.Error() != "device login need handler to continue" || auth.GetLoginType() != bingauth.TYPE_DEVICE {
+		if !strings.HasPrefix(err.Error(), "device login need handler to continue") || auth.GetLoginType() != bingauth.TYPE_DEVICE {
 			t.Error(err)
 			return
 		}
-		t.Log("Verify Code: ", cookie)
-
+		d, _ := json.Marshal(auth)
+		code := strings.Split(err.Error(), "code: ")[1]
+		t.Log("Verify Code: ", code)
+		auth := bingauth.NewAuth("a@b.c", "", bingauth.TYPE_DEVICE)
+		auth.SetContext(d)
+		auth.SetCookie(cookie)
 		cookie, err = auth.AuthDevice()
 		if err != nil {
 			t.Error(err)

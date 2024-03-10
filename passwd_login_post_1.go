@@ -16,7 +16,7 @@ func (a *AuthStruct) passwdLoginPost1() (err error) {
 	postData.Add("canary", "")
 	postData.Add("ctx", "")
 	postData.Add("hpgrequestid", "")
-	postData.Add("PPFT", a.flowToken)
+	postData.Add("PPFT", a.FlowToken)
 	postData.Add("PPSX", "Passpor")
 	postData.Add("NewUser", "1")
 	postData.Add("FoundMSAs", "")
@@ -27,18 +27,18 @@ func (a *AuthStruct) passwdLoginPost1() (err error) {
 	postData.Add("isSignupPost", "0")
 	postData.Add("isRecoveryAttemptPost", "0")
 	postData.Add("i13", "1")
-	postData.Add("login", a.account)
-	postData.Add("loginfmt", a.account)
+	postData.Add("login", a.Account)
+	postData.Add("loginfmt", a.Account)
 	postData.Add("type", "11")
 	postData.Add("LoginOptions", "3")
 	postData.Add("lrt", "")
 	postData.Add("lrtPartition", "")
 	postData.Add("hisRegion", "")
 	postData.Add("hisScaleUnit", "")
-	postData.Add("passwd", a.password)
+	postData.Add("passwd", a.Password)
 
 	// 登录账号 => https://login.live.com/ppsecure/post.srf?contextid=
-	a.reqClient.Post().SetUrl("%v", a.urlPostMsa).
+	a.reqClient.Post().SetUrl("%v", a.UrlPostMsa).
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetBody(strings.NewReader(postData.Encode())).
 		Do()
@@ -50,10 +50,10 @@ func (a *AuthStruct) passwdLoginPost1() (err error) {
 	// fmt.Println(a.reqClient.GetBodyString())
 
 	re := regexp.MustCompile(regUrlPost)
-	a.urlPost = getValue(re.FindString(a.reqClient.GetBodyString()))
+	a.UrlPost = getValue(re.FindString(a.reqClient.GetBodyString()))
 
 	re = regexp.MustCompile(regPPFT)
-	a.ppft = getValue(re.FindString(a.reqClient.GetBodyString()))
+	a.Ppft = getValue(re.FindString(a.reqClient.GetBodyString()))
 
 	return nil
 }

@@ -33,24 +33,24 @@ func (a *AuthStruct) getSession() (err error) {
 	}
 
 	re := regexp.MustCompile(regUrlGetCredentialType)
-	a.urlGetCredentialType = getValue(re.FindString(a.reqClient.GetBodyString()))
+	a.UrlGetCredentialType = getValue(re.FindString(a.reqClient.GetBodyString()))
 
-	tmpUrl, _ := url.Parse(a.urlGetCredentialType)
-	a.uaid = tmpUrl.Query().Get("uaid")
-	a.id = tmpUrl.Query().Get("id")
-	a.lcid = tmpUrl.Query().Get("lc")
-	a.cobrandid = tmpUrl.Query().Get("cobrandid")
+	tmpUrl, _ := url.Parse(a.UrlGetCredentialType)
+	a.Uaid = tmpUrl.Query().Get("uaid")
+	a.Id = tmpUrl.Query().Get("id")
+	a.Lcid = tmpUrl.Query().Get("lc")
+	a.Cobrandid = tmpUrl.Query().Get("cobrandid")
 
 	re = regexp.MustCompile(regUrlPostMsa)
-	a.urlPostMsa = getValue(re.FindString(a.reqClient.GetBodyString()))
+	a.UrlPostMsa = getValue(re.FindString(a.reqClient.GetBodyString()))
 
 	re = regexp.MustCompile(regSFTTag)
 	tmp := getValue(re.FindString(a.reqClient.GetBodyString()))
 	re = regexp.MustCompile(regValue)
-	a.flowToken = strings.Split(re.FindString(tmp), "\"")[1]
+	a.FlowToken = strings.Split(re.FindString(tmp), "\"")[1]
 
 	re = regexp.MustCompile(regUrlSessionState)
-	a.urlSessionState = getValue(re.FindString(a.reqClient.GetBodyString()))
+	a.UrlSessionState = getValue(re.FindString(a.reqClient.GetBodyString()))
 
 	return nil
 }

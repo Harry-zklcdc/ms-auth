@@ -1,6 +1,7 @@
 package bingauth
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -15,67 +16,84 @@ const (
 )
 
 type AuthStruct struct {
-	account   string
-	password  string
-	loginType string
+	Account   string
+	Password  string
+	LoginType string
 
 	reqClient *request.Client
 
-	id        string
-	lcid      string
-	uaid      string
-	flowToken string
-	ppft      string
-	cobrandid string
+	Id        string
+	Lcid      string
+	Uaid      string
+	FlowToken string
+	Ppft      string
+	Cobrandid string
 
-	urlGetCredentialType string
-	credentialType       getCredentialTypeResp
+	UrlGetCredentialType string
+	CredentialType       getCredentialTypeResp
 
-	urlPostMsa string // Passwd Login Part 1
-	urlPost    string // Passwd Login Part 1
+	UrlPostMsa string // Passwd Login Part 1
+	UrlPost    string // Passwd Login Part 1
 
-	urlSessionState string // Device Login Part 1
+	UrlSessionState string // Device Login Part 1
 
 	// Get Cookie
-	actionUrl    string
-	passportData struct {
-		napExp  string
-		pprid   string
-		nap     string
-		anon    string
-		anonExp string
-		t       string
+	ActionUrl    string
+	PassportData struct {
+		NAPExp  string
+		PPRID   string
+		NAP     string
+		ANON    string
+		ANONExp string
+		T       string
 	}
 }
 
 func NewAuth(account, password, loginType string) *AuthStruct {
 	return &AuthStruct{
-		account:   account,
-		password:  password,
-		loginType: loginType,
+		Account:   account,
+		Password:  password,
+		LoginType: loginType,
 		reqClient: request.NewRequest().SetUserAgent(USER_AGENT),
 	}
+}
+
+func (a *AuthStruct) SetCookie(cookies string) (err error) {
+	a.reqClient.SetCookies(cookies)
+	return
+}
+
+func (a *AuthStruct) SetContext(ctx []byte) (err error) {
+	cookies := a.reqClient.Cookies
+	err = json.Unmarshal(ctx, a)
+	if err != nil {
+		return
+	}
+	a.reqClient.Cookies = cookies
+	return
 }
 
 func (a *AuthStruct) Auth() (cookies string, err error) {
 	if err = a.getSession(); err != nil {
 		return "", fmt.Errorf("get session failed: %v", err)
 	}
-	if err = a.getCredentialType(); err != nil {
+	cookies, err = a.getCredentialType()
+	if err != nil {
 		return "", fmt.Errorf("get credential type failed: %v", err)
 	}
-	switch a.loginType {
+	switch a.LoginType {
 	case TYPE_PASSWD:
 		if err = a.passwdLoginPost1(); err != nil {
 			return "", fmt.Errorf("passwd login post1 failed: %v", err)
 		}
 	case TYPE_EMAIL:
-		if err = a.emailLoginPost1(); err != nil {
+		cookies, err = a.emailLoginPost1()
+		if err != nil {
 			return "", fmt.Errorf("email login post1 failed: %v", err)
 		}
-		return "", fmt.Errorf("email login need code to continue")
+		return cookies, fmt.Errorf("email login need code to continue")
 	case TYPE_DEVICE:
-		return a.credentialType.Credentials.RemoteNgcParams.Entropy, fmt.Errorf("device login need handler to continue")
+		return cookies, fmt.Errorf("device login need handler to continue, code: %s", a.CredentialType.Credentials.RemoteNgcParams.Entropy)
 	}
 	if err = a.keepLoginPost(); err != nil {
 		return "", fmt.Errorf("keep login post failed: %v", err)
@@ -119,7 +137,7 @@ func (a *AuthStruct) AuthDevice() (cookies string, err error) {
 }
 
 func (a *AuthStruct) GetLoginType() string {
-	return a.loginType
+	return a.LoginType
 }
 
 func getValue(s string) string {
@@ -130,7 +148,7 @@ func (a *AuthStruct) findHtmlValue(n *html.Node) (node *html.Node) {
 	if n.Type == html.ElementNode && n.Data == "form" {
 		for _, v := range n.Attr {
 			if v.Key == "action" {
-				a.actionUrl = v.Val
+				a.ActionUrl = v.Val
 			}
 		}
 	}
@@ -139,7 +157,7 @@ func (a *AuthStruct) findHtmlValue(n *html.Node) (node *html.Node) {
 			if v.Key == "id" && v.Val == "NAPExp" {
 				for _, v := range n.Attr {
 					if v.Key == "value" {
-						a.passportData.napExp = v.Val
+						a.PassportData.NAPExp = v.Val
 					}
 				}
 			}
@@ -150,7 +168,7 @@ func (a *AuthStruct) findHtmlValue(n *html.Node) (node *html.Node) {
 			if v.Key == "id" && v.Val == "pprid" {
 				for _, v := range n.Attr {
 					if v.Key == "value" {
-						a.passportData.pprid = v.Val
+						a.PassportData.PPRID = v.Val
 					}
 				}
 			}
@@ -161,7 +179,7 @@ func (a *AuthStruct) findHtmlValue(n *html.Node) (node *html.Node) {
 			if v.Key == "id" && v.Val == "NAP" {
 				for _, v := range n.Attr {
 					if v.Key == "value" {
-						a.passportData.nap = v.Val
+						a.PassportData.NAP = v.Val
 					}
 				}
 			}
@@ -172,7 +190,7 @@ func (a *AuthStruct) findHtmlValue(n *html.Node) (node *html.Node) {
 			if v.Key == "id" && v.Val == "ANON" {
 				for _, v := range n.Attr {
 					if v.Key == "value" {
-						a.passportData.anon = v.Val
+						a.PassportData.ANON = v.Val
 					}
 				}
 			}
@@ -183,7 +201,7 @@ func (a *AuthStruct) findHtmlValue(n *html.Node) (node *html.Node) {
 			if v.Key == "id" && v.Val == "ANONExp" {
 				for _, v := range n.Attr {
 					if v.Key == "value" {
-						a.passportData.anonExp = v.Val
+						a.PassportData.ANONExp = v.Val
 					}
 				}
 			}
@@ -194,7 +212,7 @@ func (a *AuthStruct) findHtmlValue(n *html.Node) (node *html.Node) {
 			if v.Key == "id" && v.Val == "t" {
 				for _, v := range n.Attr {
 					if v.Key == "value" {
-						a.passportData.t = v.Val
+						a.PassportData.T = v.Val
 					}
 				}
 			}

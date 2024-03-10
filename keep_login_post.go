@@ -15,11 +15,11 @@ func (a *AuthStruct) keepLoginPost() (err error) {
 	postdata.Add("type", "28")
 	postdata.Add("ctx", "")
 	postdata.Add("hpgrequestid", "")
-	postdata.Add("PPFT", a.ppft)
+	postdata.Add("PPFT", a.Ppft)
 	postdata.Add("canary", "")
 
 	// 保持登录 => https://login.live.com/ppsecure/post.srf
-	a.reqClient.Post().SetUrl("%v", a.urlPost).
+	a.reqClient.Post().SetUrl("%v", a.UrlPost).
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetBody(strings.NewReader(postdata.Encode())).
 		Do()
