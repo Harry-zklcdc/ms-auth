@@ -18,19 +18,21 @@ type deviceLoginPost1Resp struct {
 
 func (a *AuthStruct) deviceLoginPost1() (cookies, code string, err error) {
 	postdata := url.Values{}
-	postdata.Set("login", a.Account)
-	postdata.Set("flowtoken", a.CredentialType.Credentials.RemoteNgcParams.SessionIdentifier)
-	postdata.Set("purpose", "eOTT_RemoteNGC")
-	postdata.Set("channel", "PushNotifications")
-	postdata.Set("SAPId", "")
-	postdata.Set("lcid", a.Lcid)
-	postdata.Set("uaid", a.Uaid)
-	postdata.Set("canaryFlowToken", a.FlowToken)
+	postdata.Add("login", a.Account)
+	postdata.Add("flowtoken", a.CredentialType.Credentials.RemoteNgcParams.SessionIdentifier)
+	postdata.Add("purpose", "eOTT_RemoteNGC")
+	postdata.Add("channel", "PushNotifications")
+	postdata.Add("SAPId", "")
+	postdata.Add("lcid", a.Lcid)
+	postdata.Add("uaid", a.Uaid)
+	postdata.Add("canaryFlowToken", a.FlowToken)
 
 	// 发送2FA验证码 => https://login.live.com/GetOneTimeCode.srf?lcid=2052&id=264960&nopa=2
 	a.reqClient.Post().
 		SetUrl("https://login.live.com/GetOneTimeCode.srf?lcid=%s&id=%s&nopa=2", a.Lcid, a.Id).
 		SetContentType("application/x-www-form-urlencoded").
+		SetHeader("Accept", "application/json").
+		SetHeader("Referer", a.UrlGetCredentialType).
 		SetBody(strings.NewReader(postdata.Encode())).
 		Do()
 
@@ -48,8 +50,6 @@ func (a *AuthStruct) deviceLoginPost1() (cookies, code string, err error) {
 	} else {
 		code = a.CredentialType.Credentials.RemoteNgcParams.Entropy
 	}
-
-	// fmt.Println(a.reqClient.GetBodyString())
 
 	for _, v := range a.reqClient.Cookies {
 		values := strings.Split(v.Value, ";")

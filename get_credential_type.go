@@ -74,8 +74,7 @@ func (a *AuthStruct) getCredentialType() (err error) {
 		Username:                       a.Account,
 	}
 
-	switch a.LoginType {
-	case TYPE_DEVICE:
+	if a.LoginType == TYPE_DEVICE {
 		reqBody.IsFidoSupported = true
 	}
 
@@ -83,7 +82,7 @@ func (a *AuthStruct) getCredentialType() (err error) {
 	if err != nil {
 		return
 	}
-	a.reqClient.Post().SetUrl(a.UrlGetCredentialType).
+	a.reqClient.Post().SetUrl("%v", a.UrlGetCredentialType).
 		SetHeader("Content-Type", "application/json").
 		SetBody(bytes.NewReader(reqB)).
 		Do()

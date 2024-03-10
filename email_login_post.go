@@ -15,15 +15,15 @@ type emailLoginPost1Resp struct {
 
 func (a *AuthStruct) emailLoginPost1() (cookies string, err error) {
 	postdata := url.Values{}
-	postdata.Set("login", a.Account)
-	postdata.Set("flowtoken", a.FlowToken)
-	postdata.Set("purpose", "eOTT_OtcLogin")
-	postdata.Set("channel", "Email")
-	postdata.Set("AltEmailE", a.CredentialType.Credentials.OtcLoginEligibleProofs[0].Data)
-	postdata.Set("lcid", a.Lcid)
-	postdata.Set("uaid", a.Uaid)
-	postdata.Set("ProofConfirmation", a.Account)
-	postdata.Set("ChallengeViewSupported", "true")
+	postdata.Add("login", a.Account)
+	postdata.Add("flowtoken", a.FlowToken)
+	postdata.Add("purpose", "eOTT_OtcLogin")
+	postdata.Add("channel", "Email")
+	postdata.Add("AltEmailE", a.CredentialType.Credentials.OtcLoginEligibleProofs[0].Data)
+	postdata.Add("lcid", a.Lcid)
+	postdata.Add("uaid", a.Uaid)
+	postdata.Add("ProofConfirmation", a.Account)
+	postdata.Add("ChallengeViewSupported", "true")
 
 	// 发送邮件验证码 => https://login.live.com/GetOneTimeCode.srf?lcid=2052&id=264960&nopa=2
 	a.reqClient.Post().
