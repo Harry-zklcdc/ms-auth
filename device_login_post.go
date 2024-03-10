@@ -31,6 +31,7 @@ func (a *AuthStruct) deviceLoginPost1() (cookies, code string, err error) {
 	a.reqClient.Post().
 		SetUrl("https://login.live.com/GetOneTimeCode.srf?lcid=%s&id=%s&nopa=2", a.Lcid, a.Id).
 		SetContentType("application/x-www-form-urlencoded").
+		SetHeader("content-type", "application/x-www-form-urlencoded"). // This is IMPORTANT to use LOWERCASE letters "content-type"
 		SetHeader("Accept", "application/json").
 		SetHeader("Referer", a.UrlGetCredentialType).
 		SetBody(strings.NewReader(postdata.Encode())).
@@ -45,10 +46,10 @@ func (a *AuthStruct) deviceLoginPost1() (cookies, code string, err error) {
 	}
 
 	a.Ppft = resp.FlowToken
-	if resp.Status == 201 {
-		code = resp.DisplaySignForUI
-	} else {
+	if resp.DisplaySignForUI == "" {
 		code = a.CredentialType.Credentials.RemoteNgcParams.Entropy
+	} else {
+		code = resp.DisplaySignForUI
 	}
 
 	for _, v := range a.reqClient.Cookies {
