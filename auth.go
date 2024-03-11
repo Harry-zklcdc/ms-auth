@@ -124,10 +124,10 @@ func (a *AuthStruct) AuthEmail(code string) (cookies string, err error) {
 
 func (a *AuthStruct) AuthDevice() (cookies string, err error) {
 	if err = a.deviceLoginPost2(); err != nil {
-		return "", fmt.Errorf("device login post1 failed: %v", err)
+		return "", fmt.Errorf("device login post2 failed: %v", err)
 	}
 	if err = a.deviceLoginPost3(); err != nil {
-		return "", fmt.Errorf("device login post2 failed: %v", err)
+		return "", fmt.Errorf("device login post3 failed: %v", err)
 	}
 	if err = a.keepLoginPost(); err != nil {
 		return "", fmt.Errorf("keep login post failed: %v", err)
