@@ -1,0 +1,6 @@
+__pycache__
+
+# Golang C Export
+*.h
+*.dll
+*.so
