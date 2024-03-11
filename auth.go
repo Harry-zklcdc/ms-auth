@@ -97,6 +97,8 @@ func (a *AuthStruct) Auth() (cookies string, err error) {
 			return "", fmt.Errorf("device login post1 failed: %v", err)
 		}
 		return cookies, fmt.Errorf("device login need handler to continue, code: %s", code)
+	default:
+		return "", fmt.Errorf("unknown login type")
 	}
 	if err = a.keepLoginPost(); err != nil {
 		return "", fmt.Errorf("keep login post failed: %v", err)
