@@ -129,9 +129,34 @@ jobs:
           python -m pip install --upgrade pip
           pip install twine
 
-      - name: Download artifact
+      - name: Download Windows amd64 artifact
         uses: actions/download-artifact@v3
         with:
+          name: ms_auth-py3-win_amd64.whl
+          path: dist
+
+      - name: Download macOS amd64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ms_auth-py3-macosx_x86_64.whl
+          path: dist
+
+      - name: Download macOS arm64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ms_auth-py3-macosx_arm64.whl
+          path: dist
+  
+      - name: Download Linux amd64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ms_auth-py3-linux_x86_64.whl
+          path: dist
+
+      - name: Download Linux arm64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ms_auth-py3-linux_aarch64.whl
           path: dist
 
       - name: Publish to PyPI
