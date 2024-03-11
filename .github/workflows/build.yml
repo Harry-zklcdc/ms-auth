@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ms_auth-py3-win_amd64.whl
+          name: ms_auth-py3-win_amd64
           path: dist/ms_auth-*-win_amd64.whl
 
   build_macos:
@@ -56,18 +56,18 @@ jobs:
       
       - name: Build
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p macosx_x86_64 && \
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p macosx_arm64
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p macosx_10_15_x86_64 && \
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p macosx_11_0_arm64
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ms_auth-py3-macosx_x86_64.whl
-          path: dist/ms_auth-*-macosx_x86_64.whl
+          name: ms_auth-py3-macosx_x86_64
+          path: dist/ms_auth-*-macosx_10_15_x86_64.whl
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ms_auth-py3-macosx_arm64.whl
-          path: dist/ms_auth-*-macosx_arm64.whl
+          name: ms_auth-py3-macosx_arm64
+          path: dist/ms_auth-*-macosx_11_0_arm64.whl
 
   build_linux:
     name: Build Linux Python Whell Package
@@ -97,18 +97,18 @@ jobs:
       
       - name: Build
         run: |
-          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p linux_x86_64 && \
-          CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p linux_aarch64
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p manylinux_2_10_x86_64 && \
+          CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -trimpath -buildmode=c-shared -o ms_auth/ms_auth.so ./ms_auth/ && python3 setup.py bdist_wheel -p manylinux_2_17_aarch64
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ms_auth-py3-linux_x86_64.whl
-          path: dist/ms_auth-*-linux_x86_64.whl
+          name: ms_auth-py3-linux_x86_64
+          path: dist/ms_auth-*-manylinux_2_10_x86_64.whl
   
       - uses: actions/upload-artifact@v3
         with:
-          name: ms_auth-py3-linux_aarch64.whl
-          path: dist/ms_auth-*-linux_aarch64.whl
+          name: ms_auth-py3-linux_aarch64
+          path: dist/ms_auth-*-manylinux_2_17_aarch64.whl
 
   release:
     name: Release
@@ -132,31 +132,31 @@ jobs:
       - name: Download Windows amd64 artifact
         uses: actions/download-artifact@v3
         with:
-          name: ms_auth-py3-win_amd64.whl
+          name: ms_auth-py3-win_amd64
           path: dist
 
       - name: Download macOS amd64 artifact
         uses: actions/download-artifact@v3
         with:
-          name: ms_auth-py3-macosx_x86_64.whl
+          name: ms_auth-py3-macosx_x86_64
           path: dist
 
       - name: Download macOS arm64 artifact
         uses: actions/download-artifact@v3
         with:
-          name: ms_auth-py3-macosx_arm64.whl
+          name: ms_auth-py3-macosx_arm64
           path: dist
   
       - name: Download Linux amd64 artifact
         uses: actions/download-artifact@v3
         with:
-          name: ms_auth-py3-linux_x86_64.whl
+          name: ms_auth-py3-linux_x86_64
           path: dist
 
       - name: Download Linux arm64 artifact
         uses: actions/download-artifact@v3
         with:
-          name: ms_auth-py3-linux_aarch64.whl
+          name: ms_auth-py3-linux_aarch64
           path: dist
 
       - name: Publish to PyPI
@@ -167,7 +167,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
 
       - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: svenstaro/upload-release-action@v2
         with:
-          files: |
-            dist/*.whl
+          file: dist/*.whl
+          file_glob: true
