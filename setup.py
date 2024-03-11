@@ -10,8 +10,7 @@ setup(
     package_data={'ms_auth':['*.so','*.dll']},
     platforms=['linux', 'windows', 'macos'],
     classifiers=[
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: AGPL-3.0',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
         'Programming Language :: Python :: 3',
     ],
 )
