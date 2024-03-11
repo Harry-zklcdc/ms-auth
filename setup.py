@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ms_auth',
-    version='1.0.0',
+    version='1.1.5',
     description='Microsoft Login Lib',
     author='Harry-zklcdc',
     author_email='zklcdc@qq.com',
