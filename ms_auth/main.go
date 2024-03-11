@@ -42,6 +42,9 @@ func auth(a, p, at *C.char) C.struct_Auth {
 		}
 	}
 	d, _ := json.Marshal(msau)
+	if err == nil {
+		return C.struct_Auth{C.CString(cookiesRaw), C.CString(string(d)), C.CString("")}
+	}
 	return C.struct_Auth{C.CString(cookiesRaw), C.CString(string(d)), C.CString(err.Error())}
 }
 
